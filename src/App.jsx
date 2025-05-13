@@ -5,7 +5,7 @@ function App() {
   const [sortType, setSortType] = useState("date");
   const [sortOrder, setSortOrder] = useState("asc");
   const [openSection, setOpenSection] = useState({
-    taskList: false,
+    taskList: true,
     tasks: true,
     completedTasks: true,
   });
