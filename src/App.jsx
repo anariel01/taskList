@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -9,6 +9,14 @@ function App() {
     tasks: true,
     completedTasks: true,
   });
+  const [date, setDate] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDate(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   function toggleSection(section) {
     setOpenSection((prev) => ({
@@ -55,7 +63,7 @@ function App() {
   }
   const activeTasks = sortTask(tasks.filter((task) => !task.completed));
   const completedTasks = tasks.filter((task) => task.completed);
-  console.log(completedTasks);
+
   return (
     <div className="app">
       <div className="task-container">
@@ -95,6 +103,7 @@ function App() {
         </div>
         {openSection.tasks && (
           <TaskList
+            date={date}
             completeTask={completeTask}
             deleteTask={deleteTask}
             activeTasks={activeTasks}
@@ -170,15 +179,17 @@ function TaskForm({ addTask }) {
   );
 }
 
-function TaskList({ activeTasks, deleteTask, completeTask }) {
+function TaskList({ activeTasks, deleteTask, completeTask, date }) {
   return (
     <ul className="task-list">
       {activeTasks.map((task) => (
         <TaskItem
+          date={date}
           deleteTask={deleteTask}
           completeTask={completeTask}
           key={task.id}
           task={task}
+          isOverdue={new Date(task.deadline) < date}
         />
       ))}
     </ul>
@@ -194,10 +205,24 @@ function CompletedTaskList({ completedTasks, deleteTask }) {
   );
 }
 
-function TaskItem({ task, deleteTask, completeTask }) {
+function TaskItem({ task, deleteTask, completeTask, isOverdue }) {
   const { title, priority, deadline, id, completed } = task;
+
+  // useEffect(() => {
+  //   if (deadlineTime < dateNow && deadline < date) {
+  //     setOverdueComp(true);
+  //     return;
+  //   } else {
+  //     setOverdueComp(false);
+  //   }
+  // }, [date]);
+
   return (
-    <li className={`task-item ${priority.toLowerCase()}`}>
+    <li
+      className={`task-item ${priority.toLowerCase()} ${
+        isOverdue ? "overdue" : ""
+      }`}
+    >
       <div className="task-info">
         <div>
           {title} <strong>{priority}</strong>
